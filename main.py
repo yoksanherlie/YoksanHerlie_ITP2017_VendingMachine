@@ -1,30 +1,15 @@
-import json
+import helpers
 
 run = True
 
-def get_json_data(file):
-	with open(file) as json_data:
-		return json.load(json_data)
-
-menus = get_json_data('menus.json')
-
-def prompt(message):
-	answer = input(message).lower()
-
-	if answer == 'n':
-		return True
-
-	return False
-
-def check_valid(index, options):
-	return index >= 0 and index < len(options)
+menus = helpers.get_json_data('menus.json')
 
 def available(index):
 	return menus[index]['qty'] > 0
 
 def available_after_ordered(index, temp_order):
 	menu_item = menus[index]
-	order_item = get_data(menu_item, temp_order)
+	order_item = helpers.get_data(menu_item, temp_order)
 
 	if order_item:
 		if order_item['qty'] - menu_item['qty'] == 0:
@@ -32,30 +17,10 @@ def available_after_ordered(index, temp_order):
 
 	return True
 
-def available_stock(item, amount):
-	return item['qty'] >= amount
-
-def check_exist_temp(item, temp_order):
-	return item['name'] in [a for x in temp_order for a in x.values()]
-
-def get_data(item, item_list):
-	for i in item_list:
-		if i['name'] == item['name']:
-			return i
-
-	return False
-
-def count_total_price(temp_order):
-	total = 0
-	for order in temp_order:
-		total += int(order['price']) * order['qty']
-
-	return total
-
 def reduce_stock(temp_order):
 	for order in temp_order:
 		if order['name'] in [a for x in menus for a in x.values()]:
-			item = get_data(order, menus)
+			item = helpers.get_data(order, menus)
 			item['qty'] -= order['qty']
 
 while run:
@@ -89,7 +54,7 @@ while run:
 			choice_index = choice - 1
 
 			# check valid choice
-			if check_valid(choice_index, menus):
+			if helpers.check_valid(choice_index, menus):
 				# check if still have stock
 				if available(choice_index):
 					# check if still have remaining stock after ordered (current order)
@@ -113,18 +78,18 @@ while run:
 		while invalidAmount:
 			amount = int(input("Input the amount for " + chosen_item['name'] + ": "))
 
-			if check_exist_temp(chosen_item, temp_order):
-				item = get_data(chosen_item, temp_order)
+			if helpers.check_exist_temp(chosen_item, temp_order):
+				item = helpers.get_data(chosen_item, temp_order)
 				total_amount = item['qty'] + amount
 
-				if available_stock(chosen_item, total_amount):
+				if helpers.available_stock(chosen_item, total_amount):
 					invalidAmount = False
 					item['qty'] = total_amount
 				else:
 					print("Your total number of order for {} exceeded the stock".format(item['name']))
 					print("\n")
 			else:
-				if available_stock(chosen_item, amount):
+				if helpers.available_stock(chosen_item, amount):
 					invalidAmount = False
 					new_item = {
 						'name': chosen_item['name'],
@@ -136,13 +101,13 @@ while run:
 					print("You can't buy more than amount of the stock")
 					print("\n")
 
-		stop_order = prompt("Do you want to add another item? (y/n): ")
+		stop_order = helpers.prompt("Do you want to add another item? (y/n): ")
 		print("\n") # blank space ------------------------------------
 
 		if stop_order:
 			ordering = False
 
-	total_price = count_total_price(temp_order)
+	total_price = helpers.count_total_price(temp_order)
 
 	print("The total price is: {}".format(total_price))
 
@@ -172,10 +137,11 @@ while run:
 
 	# reduce stock
 	reduce_stock(temp_order)
+	helpers.save_menus('menus.json', menus)
 
 	print("\n") # blank space ------------------------------------
 
-	quit = prompt("Do you want to buy again? (y/n): ")
+	quit = helpers.prompt("Do you want to buy again? (y/n): ")
 
 	print("\n") # blank space ------------------------------------
 
