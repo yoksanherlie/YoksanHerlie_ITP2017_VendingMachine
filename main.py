@@ -84,7 +84,7 @@ def reduce_stock(temp_order):
 			item['qty'] -= order['qty']
 
 while run:
-	print("======= Vending Machine v1 =======\n")
+	print("======= Vending Machine v2 =======\n")
 
 	# print information
 	print("No. | Name | Price | Stock")
