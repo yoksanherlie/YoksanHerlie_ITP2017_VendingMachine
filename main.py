@@ -41,11 +41,21 @@ def prompt(message):
 
 	return False
 
-def checkValid(index, options):
+def check_valid(index, options):
 	return index >= 0 and index < len(options)
 
 def available(index):
 	return menus[index]['qty'] > 0
+
+def available_after_ordered(index, temp_order):
+	menu_item = menus[index]
+	order_item = get_data(menu_item, temp_order)
+
+	if order_item:
+		if order_item['qty'] - menu_item['qty'] == 0:
+			return False
+
+	return True
 
 def available_stock(item, amount):
 	return item['qty'] >= amount
@@ -57,6 +67,8 @@ def get_data(item, item_list):
 	for i in item_list:
 		if i['name'] == item['name']:
 			return i
+
+	return False
 
 def count_total_price(temp_order):
 	total = 0
@@ -102,10 +114,15 @@ while run:
 			choice_index = choice - 1
 
 			# check valid choice
-			if checkValid(choice_index, menus):
+			if check_valid(choice_index, menus):
 				# check if still have stock
 				if available(choice_index):
-					invalidChoice = False
+					# check if still have remaining stock after ordered (current order)
+					if available_after_ordered(choice_index, temp_order):
+						invalidChoice = False
+					else:
+						print("You have already ordered all remaining stock(s)")
+						print("\n")
 				else:
 					print("Item out of stock")
 					print("\n")
@@ -122,7 +139,7 @@ while run:
 			amount = int(input("Input the amount for " + chosen_item['name'] + ": "))
 
 			if check_exist_temp(chosen_item, temp_order):
-				item = get_order(chosen_item, temp_order)
+				item = get_data(chosen_item, temp_order)
 				total_amount = item['qty'] + amount
 
 				if available_stock(chosen_item, total_amount):
@@ -145,17 +162,16 @@ while run:
 					print("\n")
 
 		stop_order = prompt("Do you want to add another item? (y/n): ")
+		print("\n") # blank space ------------------------------------
 
 		if stop_order:
 			ordering = False
-
-	print("\n") # blank space ------------------------------------
 
 	total_price = count_total_price(temp_order)
 
 	print("The total price is: {}".format(total_price))
 
-	# # ================= payment =================
+	# ================= payment =================
 	for i in range(1, 21):
 		price_amount = i * 5000
 		print(str(i) + ". " + str(price_amount))
@@ -164,15 +180,18 @@ while run:
 
 	while invalid_price:
 		payment_option = int(input("Input the payment option: "))
-		
-		payment = payment_option * 5000
 
-		if payment >= total_price:
-			change = payment - total_price
-			invalid_price = False
+		if payment_option > 0 and payment_option <= 20:
+			payment = payment_option * 5000
+
+			if payment >= total_price:
+				change = payment - total_price
+				invalid_price = False
+			else:
+				print("Payment is not enough!")
+				print("\n") # blank space ------------------------------------
 		else:
-			print("Payment is not enough!")
-			print("\n") # blank space ------------------------------------
+			print("Payment option not available")
 
 	print("Change: {}".format(change))
 
