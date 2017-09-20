@@ -1,37 +1,12 @@
+import json
+
 run = True
 
-menus = [
-	{
-		'name': 'Coca-cola',
-		'price': '15000',
-		'qty': 20
-	},
-	{
-		'name': 'Sprite',
-		'price': '10000',
-		'qty': 20
-	},
-	{
-		'name': 'Nescafe',
-		'price': '5000',
-		'qty': 20
-	},
-	{
-		'name': 'Kitkat',
-		'price': '5000',
-		'qty': 20
-	},
-	{
-		'name': 'Fitbar',
-		'price': '5000',
-		'qty': 20
-	},
-	{
-		'name': 'Mentos',
-		'price': '5000',
-		'qty': 20
-	}
-]
+def get_json_data(file):
+	with open(file) as json_data:
+		return json.load(json_data)
+
+menus = get_json_data('menus.json')
 
 def prompt(message):
 	answer = input(message).lower()
