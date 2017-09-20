@@ -26,7 +26,7 @@ def reduce_stock(temp_order):
 while run:
 	print("======= Vending Machine v1 =======\n")
 
-	# print information
+	# ================= print information =================
 	print("No. | Name | Price | Stock")
 	print("--------------------------")
 
@@ -41,7 +41,6 @@ while run:
 
 	# ================= start ordering =================
 	ordering = True
-
 	temp_order = []
 	
 	while ordering:
