@@ -136,7 +136,7 @@ while run:
 
 	# reduce stock
 	reduce_stock(temp_order)
-	helpers.save_menus('menus.json', menus)
+	# helpers.save_menus('menus.json', menus)
 
 	print("\n") # blank space ------------------------------------
 
